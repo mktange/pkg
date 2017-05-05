@@ -19,30 +19,32 @@ type Client http.Client
 
 func (c *Client) Get(url string) (resp *http.Response, cleanup func(), err error) {
 	resp, err = (*http.Client)(c).Get(url)
-	return resp, responseCloser(resp), err
+	return resp, ResponseCloser(resp), err
 }
 
 func (c *Client) Head(url string) (resp *http.Response, cleanup func(), err error) {
 	resp, err = (*http.Client)(c).Head(url)
-	return resp, responseCloser(resp), err
+	return resp, ResponseCloser(resp), err
 }
 
 func (c *Client) Post(url string, contentType string, body io.Reader) (resp *http.Response, cleanup func(), err error) {
 	resp, err = (*http.Client)(c).Post(url, contentType, body)
-	return resp, responseCloser(resp), err
+	return resp, ResponseCloser(resp), err
 }
 
 func (c *Client) PostForm(url string, data url.Values) (resp *http.Response, cleanup func(), err error) {
 	resp, err = (*http.Client)(c).PostForm(url, data)
-	return resp, responseCloser(resp), err
+	return resp, ResponseCloser(resp), err
 }
 
 func (c *Client) Do(req *http.Request) (resp *http.Response, cleanup func(), err error) {
 	resp, err = (*http.Client)(c).Do(req)
-	return resp, responseCloser(resp), err
+	return resp, ResponseCloser(resp), err
 }
 
-func responseCloser(resp *http.Response) func() {
+// ResponseCloser returns a function that closes the body of the provided response. It fully drains and closes the body
+// and discards any errors. This function is suitable for deferring.
+func ResponseCloser(resp *http.Response) func() {
 	if resp == nil {
 		// if response is nil, return a no-op cleanup function
 		return func() {}
